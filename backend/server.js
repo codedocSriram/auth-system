@@ -1,11 +1,14 @@
 import express from "express";
-
+import dotenv from "dotenv";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import { connectDB } from "./db/connectDB.js";
+import authRouter from "./routes/auth.router.js";
+dotenv.config();
 const app = express();
+const PORT = process.env.PORT || 3000;
+app.use("/api/auth", authRouter);
 
-app.get("/", (req, res) => {
-    res.send("Hello world! ");
-});
-
-app.listen(3000, () => {
-    console.log("Server is running in port 3000");
+app.listen(PORT, () => {
+    console.log("Server is running in port: ", PORT);
 });
