@@ -84,7 +84,8 @@ export const login = (req, res) => {
 };
 
 export const logout = (req, res) => {
-    res.send("Logut");
+    res.clearCookie("token");
+    res.status(200).json({ success: true, message: "Logged out successfuly!" });
 };
 
 export const forgotPassword = (req, res) => {

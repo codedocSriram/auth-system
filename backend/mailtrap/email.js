@@ -63,9 +63,9 @@ export const sendWelcomeMail = async (email, userName) => {
                 "api-key": BREVO_API_KEY,
             },
         });
-        console.log("Welcome email sent successfully", response);
+        console.log("Email sent successfully", response);
     } catch (error) {
-        console.log(`Error sending Welcome email: ${error}`);
-        throw new Error(`Error sending Welcome email: ${error}`);
+        console.log(`Error sending verification email: ${error}`);
+        throw new Error(`Error sending verification email: ${error}`);
     }
 };
