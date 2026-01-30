@@ -85,7 +85,7 @@ export const sendPasswordResetEmail = async (email, resetUrl) => {
         ],
         subject: "Password Reset",
         htmlContent: PASSWORD_RESET_REQUEST_TEMPLATE.replace(
-            "{resetUrl}",
+            "{resetURL}",
             resetUrl,
         ),
         category: "Password Reset",
@@ -101,5 +101,34 @@ export const sendPasswordResetEmail = async (email, resetUrl) => {
     } catch (error) {
         console.log(`Error sending verification email: ${error.message}`);
         throw new Error(`Error sending verification email: ${error.message}`);
+    }
+};
+
+export const sendResetSuccessEmail = async (email) => {
+    const emailData = {
+        sender: {
+            name: "Pingify Admin",
+            email: "mailsriram98@gmail.com",
+        },
+        to: [
+            {
+                email: email,
+            },
+        ],
+        subject: "Password reset successful",
+        htmlContent: PASSWORD_RESET_SUCCESS_TEMPLATE,
+        category: "Password Reset successful",
+    };
+    try {
+        const response = await axios.post(BREVO_URL, emailData, {
+            headers: {
+                "Content-Type": "application/json",
+                "api-key": BREVO_API_KEY,
+            },
+        });
+        console.log("Email sent successfully", response);
+    } catch (error) {
+        console.log(`Error sending success email: ${error.message}`);
+        throw new Error(`Error sending success email: ${error.message}`);
     }
 };

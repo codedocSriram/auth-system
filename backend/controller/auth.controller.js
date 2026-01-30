@@ -6,6 +6,7 @@ import {
     sendVerificationEmail,
     sendWelcomeMail,
     sendPasswordResetEmail,
+    sendResetSuccessEmail,
 } from "../mailtrap/email.js";
 export const signup = async (req, res) => {
     const { fullName, email, password } = req.body;
@@ -152,6 +153,38 @@ export const forgotPassword = async (req, res) => {
         res.status(500).json({
             success: false,
             message: "internal server error",
+        });
+    }
+};
+
+export const resetPassword = async (req, res) => {
+    try {
+        const { token } = req.params;
+        const { password } = req.body;
+        const user = await User.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpiresAt: { $gt: Date.now() },
+        });
+        if (!user) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Invalid reset token" });
+        }
+        const hashPassword = await bcrypt.hash(password, 10);
+        user.password = hashPassword;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpiresAt = undefined;
+        await user.save();
+        await sendResetSuccessEmail(user.email);
+        res.status(200).json({
+            success: true,
+            message: "Password reset successful!",
+        });
+    } catch (error) {
+        console.log("Error in resetPassword function:", error.message);
+        res.status(500).json({
+            success: false,
+            message: "Error resetting password",
         });
     }
 };
