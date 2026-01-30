@@ -8,7 +8,7 @@ import {
 const authRouter = express.Router();
 
 authRouter.post("/signup", signup);
-authRouter.get("/login", login);
+authRouter.post("/login", login);
 authRouter.post("/logout", logout);
 authRouter.post("/verify-email", verifyEmail);
 export default authRouter;

@@ -79,8 +79,39 @@ export const verifyEmail = async (req, res) => {
     }
 };
 
-export const login = (req, res) => {
-    res.send("login page");
+export const login = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Invalid credentials" });
+        }
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Invalid credentials" });
+        }
+        generateTokenAndSetCookie(res, user._id);
+        user.lastLogin = new Date();
+        await user.save();
+        res.status(200).json({
+            success: true,
+            message: "Logged in Successfully!",
+            user: {
+                ...user._doc,
+                password: undefined,
+            },
+        });
+    } catch (error) {
+        console.log("Error in login function:", error.message);
+        res.status(500).json({
+            success: false,
+            message: "internal server error",
+        });
+    }
 };
 
 export const logout = (req, res) => {
