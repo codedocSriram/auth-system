@@ -4,6 +4,7 @@ import {
     login,
     logout,
     verifyEmail,
+    forgotPassword,
 } from "../controller/auth.controller.js";
 const authRouter = express.Router();
 
@@ -11,4 +12,5 @@ authRouter.post("/signup", signup);
 authRouter.post("/login", login);
 authRouter.post("/logout", logout);
 authRouter.post("/verify-email", verifyEmail);
+authRouter.post("/forgot-password", forgotPassword);
 export default authRouter;
