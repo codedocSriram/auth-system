@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken";
 
 export const verifyToken = async (req, res, next) => {
-    const token = req.cookie.token;
     try {
+        const { token } = req.cookies;
         if (!token) {
             return res
                 .status(401)
