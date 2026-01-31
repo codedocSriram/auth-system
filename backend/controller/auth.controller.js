@@ -39,7 +39,7 @@ export const signup = async (req, res) => {
         await user.save();
         res.status(201).json({
             success: true,
-            message: "User created successfully",
+            message: "User created, verify email to continue",
             user: {
                 ...user._doc,
                 password: undefined,
