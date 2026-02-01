@@ -14,3 +14,18 @@ export const generateTokenAndSetCookie = (res, userId) => {
 
     return token;
 };
+
+export const generateSignupTokenAndSetCookie = (res, email) => {
+    const signupToken = jwt.sign({ email }, process.env.JWT_KEY, {
+        expiresIn: "2m",
+    });
+
+    res.cookie("signupToken", signupToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 2 * 60 * 1000,
+    });
+
+    return signupToken;
+};

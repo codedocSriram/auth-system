@@ -5,6 +5,7 @@ import Homepage from "./pages/Homepage";
 import SignUpPage from "./pages/SignUpPage";
 import LoginPage from "./pages/LoginPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
+import { Toaster } from "react-hot-toast";
 const App = () => {
     return (
         <div
@@ -41,6 +42,7 @@ const App = () => {
                     element={<EmailVerificationPage />}
                 />
             </Routes>
+            <Toaster />
         </div>
     );
 };

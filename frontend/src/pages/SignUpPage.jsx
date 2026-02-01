@@ -16,6 +16,7 @@ const SignUpPage = () => {
         event.preventDefault();
         try {
             await signup(email, password, name);
+            localStorage.setItem("email", email);
             navigate("/verify-email");
         } catch (error) {
             console.log(error);

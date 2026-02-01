@@ -1,4 +1,5 @@
 import { User } from "../models/user.model.js";
+import { Usersignup } from "../models/usersignup.model.js";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
@@ -17,31 +18,42 @@ export const signup = async (req, res) => {
                 message: "All fields are required",
             });
         }
-        const userAlreadyExists = await User.findOne({ email });
+        const userAlreadyExists = await User.findOne({
+            email,
+        });
         if (userAlreadyExists) {
             return res
                 .status(400)
-                .json({ success: false, message: "User already exists" });
+                .json({ success: false, message: "Account already exists" });
+        }
+        const signupUser = await Usersignup.findOne({
+            email,
+        });
+        if (signupUser) {
+            return res.status(400).json({
+                success: false,
+                message: "OTP already sent, try after few minutes",
+            });
         }
         const hashPassword = await bcrypt.hash(password, 10);
         const verificationToken = Math.floor(
             100000 + Math.random() * 900000,
         ).toString();
-        const user = new User({
+        const newSignUp = new Usersignup({
+            email: email,
             fullName: fullName,
             password: hashPassword,
-            email: email,
             verificationToken: verificationToken,
-            verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
         });
-        generateTokenAndSetCookie(res, user._id);
-        await sendVerificationEmail(user.email, verificationToken);
-        await user.save();
+        await newSignUp.save();
+
+        await sendVerificationEmail(email, verificationToken);
         res.status(201).json({
             success: true,
-            message: "User created, verify email to continue",
+            message: "Verify email to continue",
             user: {
-                ...user._doc,
+                ...newSignUp._doc,
+                verificationToken: undefined,
                 password: undefined,
             },
         });
@@ -51,26 +63,27 @@ export const signup = async (req, res) => {
 };
 
 export const verifyEmail = async (req, res) => {
-    // const {email,code} = req.body;
-    const { code } = req.body;
+    const { email, code } = req.body;
     try {
-        const user = await User.findOne({
-            // email: email,
+        const signupUser = await Usersignup.findOne({
+            email: email,
             verificationToken: code,
-            verificationTokenExpiresAt: { $gt: Date.now() },
         });
-        if (!user) {
+        if (!signupUser) {
             return res.status(400).json({
                 success: false,
                 message: "Invalid/expired verification code",
             });
         }
-        user.isVerified = true;
-        user.verificationToken = undefined;
-        user.verificationTokenExpiresAt = undefined;
+        const user = new User({
+            fullName: signupUser.fullName,
+            password: signupUser.password,
+            email: email,
+        });
         await user.save();
 
         await sendWelcomeMail(user.email, user.fullName);
+        generateTokenAndSetCookie(res, user._id);
         res.status(201).json({
             success: true,
             user: {
