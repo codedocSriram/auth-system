@@ -79,6 +79,7 @@ export const verifyEmail = async (req, res) => {
             fullName: signupUser.fullName,
             password: signupUser.password,
             email: email,
+            isVerified: true,
         });
         await user.save();
 
