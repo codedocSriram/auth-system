@@ -217,6 +217,7 @@ export const checkAuth = async (req, res) => {
                 .status(400)
                 .json({ success: true, message: "user not found!" });
         }
+        console.log("ASfnsdinfs", user);
         res.status(200).json({
             success: true,
             user: {
