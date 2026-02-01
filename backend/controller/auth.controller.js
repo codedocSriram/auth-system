@@ -94,6 +94,12 @@ export const login = async (req, res) => {
                 .status(400)
                 .json({ success: false, message: "Invalid credentials" });
         }
+        const verified = user.isVerified;
+        if (!verified) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Account not verified!" });
+        }
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             return res

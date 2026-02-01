@@ -1,17 +1,25 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Input from "../components/Input";
-import { User, Mail, Lock } from "lucide-react";
+import { User, Mail, Lock, Loader } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, Navigate } from "react-router-dom";
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
+import { useAuthStore } from "../store/authStore";
 const SignUpPage = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [isLoading, setIsLoading] = useState("");
-    const handleSignUp = (event) => {
+    const { signup, error, isLoading } = useAuthStore();
+    const navigate = useNavigate();
+    const handleSignUp = async (event) => {
         event.preventDefault();
+        try {
+            await signup(email, password, name);
+            navigate("/verify-email");
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     return (
@@ -47,6 +55,11 @@ const SignUpPage = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
+                    {error && (
+                        <p className="text-red-500 font-semibold mt-2">
+                            {error}
+                        </p>
+                    )}
                     <PasswordStrengthMeter password={password} />
                     <motion.button
                         className="mt-5 w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white 
@@ -58,7 +71,14 @@ const SignUpPage = () => {
                         type="submit"
                         disabled={isLoading}
                     >
-                        Sign Up
+                        {isLoading ? (
+                            <Loader
+                                className=" animate-spin mx-auto"
+                                size={24}
+                            />
+                        ) : (
+                            "Sign Up"
+                        )}
                     </motion.button>
                 </form>
             </div>
